@@ -1,4 +1,4 @@
-# CHUN折腾
+﻿# CHUN折腾
 
 > 折腾过的项目，都在这里 —— <https://w.wanyc.xyz>
 
@@ -160,8 +160,8 @@ python scripts/make-og.py
 | --- | --- |
 | Cloudflare Pages 项目名 | `chun` |
 | 生产域名 | `w.wanyc.xyz` |
-| 备用域名 | `chun.pages.dev` |
-| DNS | `w` CNAME → `chun.pages.dev`（Proxy 开启） |
+| 备用域名 | `chun-2wh.pages.dev` |
+| DNS | `w` CNAME → `chun-2wh.pages.dev`（Proxy 开启） |
 | 证书 | Cloudflare 自动签发，自动续期 |
 
 绑自定义域：Cloudflare 面板 → Workers & Pages → `chun` → Custom domains → 添加 `w.wanyc.xyz`。
