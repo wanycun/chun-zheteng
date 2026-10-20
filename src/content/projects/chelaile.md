@@ -6,6 +6,7 @@ startDate: 2026-10-15
 cost: 0
 hours: 5
 stack: [JavaScript, 前端产物分析, 第三方 API, 飞牛 NAS]
+cover: /covers/chelaile-cover.jpg
 tags: [逆向, 数据抓取, 公交, 数据分析]
 featured: true
 changelog:
@@ -79,6 +80,16 @@ index.html
 ## 结果
 
 **跑通了，一直在用：飞牛 NAS 上跑着服务，网页版，iPhone 打开就看。**
+
+<img src="/covers/chelaile-screen.jpg" alt="车来了网页版在 iPhone 上的样子：我的线路、附近站点、底部导航" style="max-width:340px;display:block;margin:1.6em auto;border-radius:18px" />
+
+界面很简单，三块就够用：
+
+- **我的线路**：常坐的置顶，直接显示"还有几分钟 / 还有几站"（截图里 B8 是 7 分钟、还有 2 站）
+- **附近站点**：按距离排，每个站点下面直接列线路和到站时间
+- **底部导航**：附近 / 收藏 / 换乘 / 城市
+
+细节上做了一点区分：换乘站会单独标出地铁（体育西路这种），公交线路会带运营时段（777 是 06:30–22:00）。
 
 - 广州的城市、站点、线路、在途车辆、到站倒计时都能稳定取到
 - 拿手机 Safari 打开网页即可，不用装 App、不用看广告、不用给定位权限
