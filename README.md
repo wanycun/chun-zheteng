@@ -1,4 +1,4 @@
-﻿# CHUN折腾
+# CHUN折腾
 
 > 折腾过的项目，都在这里 —— <https://w.wanyc.xyz>
 
@@ -119,19 +119,28 @@ changelog:                # 更新日志（可选）
 
 ## 发布
 
+**推荐：push 就部署。** 仓库已接上 Cloudflare Pages，推到 `main` 自动触发构建：
+
 ```bash
-npm run deploy
-# = astro build && wrangler pages deploy dist --project-name chun
+git add -A && git commit -m "新项目：xxx" && git push
 ```
 
-第一次需要登录 Cloudflare：
+Cloudflare 拉代码 → 跑 `npm run build` → 发布到 w.wanyc.xyz，约 1 分钟生效。
+构建日志：Pages 面板 → 项目 `chun` → 部署列表。
+
+**备用：本地直传**（不想 push，或只想临时改一下线上）：
+
+```bash
+npm run deploy
+# = astro build && wrangler pages deploy dist --project-name chun --branch main
+```
+
+第一次用本地直传需要登录 Cloudflare：
 
 ```bash
 npx wrangler login          # 浏览器点一下授权
 npx wrangler whoami         # 确认当前账号
 ```
-
-发布完几十秒生效。**改 Markdown → 跑一条命令 → 线上更新**，全程不需要登任何后台。
 
 ---
 
@@ -159,24 +168,26 @@ python scripts/make-og.py
 | 项 | 值 |
 | --- | --- |
 | Cloudflare Pages 项目名 | `chun` |
+| GitHub 仓库 | `wanycun/chun-zheteng`（public） |
+| 自动构建 | 推送 `main` 触发；构建命令 `npm run build`，输出目录 `dist` |
 | 生产域名 | `w.wanyc.xyz` |
 | 备用域名 | `chun-2wh.pages.dev` |
 | DNS | `w` CNAME → `chun-2wh.pages.dev`（Proxy 开启） |
 | 证书 | Cloudflare 自动签发，自动续期 |
+| 访问统计 | Cloudflare Web Analytics，token 在 `src/lib/site.ts` 的 `analytics.token` |
 
-绑自定义域：Cloudflare 面板 → Workers & Pages → `chun` → Custom domains → 添加 `w.wanyc.xyz`。
+> wrangler 的 OAuth 令牌**没有 `dns:write` 权限**，所以自定义域名的 DNS 记录要手动加（或在面板里点），不能靠 API 自动建。
+
+绑自定义域：Cloudflare 面板 → Workers & Pages → `chun` → 自定义域 → 添加 `w.wanyc.xyz`。
 
 ---
 
-## 关于示例内容
+## 内容说明
 
-仓库里现有的 **5 个项目 + 4 条笔记都是示例**，用来展示结构和排版。写自己的第一篇时：
+仓库里现有 **9 个项目 + 4 条笔记**，都是真实做过的东西（车来了数据、AiToEarn 自部署、公众号工作流、
+S3_Station、ESP32 灯带面板等），其中也包含没做成、停下来的（`status: 暂停` / `翻车`）。
 
-1. 直接改文件名和内容，或删掉不要的
-2. 别忘了一起改 `src/content/projects/` 里的 `chun-site.md`（它描述的就是本站本身，可以留着）
-
-示例内容里的技术细节是真实可查的通用做法（robocopy、Cloudflare Tunnel、Astro content collections 等），
-但**不代表你的真实经历**，替换成自己的记录即可。
+写新记录的约定：**没做成就写没做成**，踩坑比成功更有参考价值。
 
 ---
 

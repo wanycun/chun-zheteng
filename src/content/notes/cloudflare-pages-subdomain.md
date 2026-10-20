@@ -1,40 +1,40 @@
 ---
-title: Cloudflare Pages 绑子域的两个坑
+title: Cloudflare Pages 绑子域：DNS 不会自己长出来
 date: 2026-08-15
 tags: [Cloudflare, 建站, 部署]
-summary: 自定义域一直「验证中」，以及绑定后 www 和裸域不对——都是 DNS 记录类型的问题。
+summary: 自定义域加进 Pages 后一直「待验证」，DNS 里也没有记录。原因有两个：记录要自己加，授权令牌没 DNS 权限。
 ---
 
-## 坑一：一直卡在「正在验证」
+给 Pages 项目加了 `w.example.com`，状态一直卡在「正在验证」，去 DNS 面板一看——**根本没有这条记录**。
 
-在 Pages 项目里加自定义域 `w.example.com` 之后，状态死活不动。原因通常是：
+## 坑一：以为 Pages 会自动建记录
 
-- 这个域名的 **zone 不在同一个 Cloudflare 账号**下 —— Pages 没法自动建记录
-- 或者 DNS 里已经有一条手动加的、指错的记录挡住了
+在主域和 Pages 项目同一个账号的情况下，大多数时候它会自动建。
+但这次没有，而且 `wrangler` 的 OAuth 令牌**没有 DNS 写权限**，所以也建不了。
 
-判断方法：项目设置里的域名状态会写 `CNAME record not found`，去 DNS 面板看一眼有没有这条记录。
-
-正确的记录是：
+手动补一条就完了：
 
 ```
-w    CNAME    <项目名>.pages.dev    （Proxy 状态：已开启）
+类型   名称   内容                     代理状态
+CNAME  w      <项目名>.pages.dev        已代理（橙色云）
 ```
 
-## 坑二：把根域和子域混着加
+`wrangler login` 申请到的权限里包括 `pages:write`、`zone:read`、`ssl_certs:write`，**但不含 `dns:write`**——
+所以"用 API 自动加记录"这条路走不通，只能在面板里点，或者单独建一个带 `Zone.DNS:Edit` 的 Token。
 
-想在同一个项目上同时支持 `example.com` 和 `www.example.com`，会碰到：
+## 坑二：记录加了还是 522，然后突然就好了
 
-- 根域（apex）不能直接 CNAME，Cloudflare 会帮你转成 `A` 记录 + CNAME flattening，通常能用
-- 但**两个都加到一个 Pages 项目上，跳转方向需要自己定**，否则两边内容重复、SEO 分散
+刚加完记录，访问返回 `HTTP 522`（Cloudflare 连不上源站），本地 `nslookup` 还是 NXDOMAIN。
+这是三件事同时发生：
 
-更省事的做法：只绑一个，另一个用 **Redirect Rules** 301 过去。
+1. 本地 DNS 有**负缓存**，NXDOMAIN 会被缓存几分钟 → `ipconfig /flushdns`
+2. 边缘节点还在下发新记录
+3. Pages 那边域名验证还没跑完，验证完成前不一定能正确路由
 
-```text
-# 只绑 w.example.com，然后加一条重定向规则
-https://example.com/*  →  https://w.example.com/$1 （301）
-```
+等了大约两分钟，域名状态从 `pending` 变成 `active`，522 自己就没了，证书也签好了。
+**遇到 522 先别改配置，等两分钟再看。**
 
-## 顺带记一个
+## 顺带记两条
 
-证书签发通常几十秒到几分钟。如果超过 15 分钟还是「待验证」，先点一次 **重新验证**，
-再不行就删了域名重加一遍——比等更快。
+- 证书签发通常几十秒到几分钟；超过 15 分钟还是「待验证」，先点一次重新验证，不行就删了域名重加，比干等快
+- 根域（apex）不能直接 CNAME，Cloudflare 会自动做 flattening；但**同一个项目同时绑根域和 `www` 容易出现内容重复**，更省事的做法是只绑一个，另一个用 Redirect Rule 301 过去
