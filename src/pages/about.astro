@@ -1,0 +1,89 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../lib/site';
+---
+
+<Base title="关于" description="关于 CHUN折腾：为什么做这个站、折腾些什么、站是怎么搭的。">
+  <div class="wrap">
+    <div class="mx-auto max-w-2xl">
+      <header class="mb-10">
+        <h1 class="text-[30px] font-black tracking-tight text-ink sm:text-[38px]">关于</h1>
+        <p class="mt-2 text-[14.5px] text-ink-soft">{SITE.tagline}</p>
+      </header>
+
+      <div class="article">
+        <h2>这个站是什么</h2>
+        <p>
+          <strong>CHUN折腾</strong> 是我的个人项目记录本。不是博客，不追热点，也不写"10 个技巧"；
+          它只记一件事——<strong>我动手做过的东西</strong>。
+        </p>
+        <p>每条记录尽量回答四个问题：</p>
+        <ul>
+          <li>为什么想搞这个？</li>
+          <li>选了哪条路，为什么没选另一条？</li>
+          <li>中间卡在哪，最后怎么过去的？</li>
+          <li>跑通没有，花了多少时间和钱，值不值？</li>
+        </ul>
+        <p>
+          写得不一定漂亮，但都是自己踩过的。同好看到了能少走两步，我自己半年后忘了也能翻回来。
+        </p>
+
+        <h2>折腾些什么</h2>
+        <p>
+          软件、系统和一点硬件，基本上都是"能自己跑起来就别买现成"的那类：
+          静态站与前端、脚本自动化、Docker 与自托管、AI 工具链、旧设备再利用。
+        </p>
+        <p>
+          记录里会明确写<strong>没搞成</strong>的部分——<code>翻车</code>也是记录的一种状态；
+          一个"跑通了但花了 8 小时不值"的结论，比一篇只讲成功的教程诚实。
+        </p>
+
+        <h2>这个站怎么搭的</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>部分</th>
+              <th>用的什么</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>框架</td><td>Astro（纯静态，默认零 JS）</td></tr>
+            <tr><td>样式</td><td>Tailwind CSS，深 / 浅色双主题</td></tr>
+            <tr><td>内容</td><td>Markdown 文件，写在仓库里就是发布</td></tr>
+            <tr><td>托管</td><td>Cloudflare Pages（免费、全球 CDN、自动 HTTPS）</td></tr>
+            <tr><td>域名</td><td>w.wanyc.xyz</td></tr>
+          </tbody>
+        </table>
+        <p>
+          发布流程就一条命令：写文件 → <code>npm run deploy</code>。没有后台、没有数据库、没有登录，
+          所以它也很难坏。
+        </p>
+
+        <h2>联系</h2>
+        {
+          SITE.social.github || SITE.social.email ? (
+            <ul>
+              {SITE.social.github && (
+                <li>
+                  GitHub：<a href={SITE.social.github} rel="me">{SITE.social.github}</a>
+                </li>
+              )}
+              {SITE.social.email && (
+                <li>
+                  邮箱：<a href={`mailto:${SITE.social.email}`}>{SITE.social.email}</a>
+                </li>
+              )}
+            </ul>
+          ) : (
+            <p class="text-ink-mute">
+              还没填联系方式——在 <code>src/lib/site.ts</code> 的 <code>social</code> 里加上 GitHub 或邮箱，这里会自动出现。
+            </p>
+          )
+        }
+        <blockquote>
+          转载随意，注明出处就行。如果某条记录正好帮你省了半天，那就值了。
+        </blockquote>
+      </div>
+    </div>
+  </div>
+</Base>

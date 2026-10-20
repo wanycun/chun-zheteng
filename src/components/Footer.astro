@@ -1,0 +1,26 @@
+---
+import { SITE } from '../lib/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-16 border-t border-line">
+  <div class="wrap flex flex-col gap-5 py-9 text-sm text-ink-mute sm:flex-row sm:items-start sm:justify-between">
+    <div class="space-y-1.5">
+      <p class="font-semibold text-ink">
+        CHUN<span class="text-accent">折腾</span>
+      </p>
+      <p>{SITE.tagline}</p>
+      <p>© {year} {SITE.author} · 内容随意引用，注明出处即可</p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2 sm:justify-end">
+      <a href="/projects/" class="hover:text-ink">项目</a>
+      <a href="/notes/" class="hover:text-ink">笔记</a>
+      <a href="/tags/" class="hover:text-ink">标签</a>
+      <a href="/rss.xml" class="hover:text-ink">RSS</a>
+      {SITE.social.github && <a href={SITE.social.github} class="hover:text-ink" rel="me">GitHub</a>}
+      {SITE.social.email && <a href={`mailto:${SITE.social.email}`} class="hover:text-ink">邮件</a>}
+      <span class="w-full sm:w-auto sm:pl-1">Astro × Cloudflare Pages</span>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../lib/site';
+
+interface Props {
+  entry: CollectionEntry<'notes'>;
+}
+const { entry } = Astro.props;
+const d = entry.data;
+const href = `/notes/${entry.id}/`;
+
+const plain = (entry.body ?? '')
+  .replace(/```[\s\S]*?```/g, ' ')
+  .replace(/[#>*`\-\[\]]/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
+const excerpt = d.summary ?? (plain.length > 90 ? plain.slice(0, 90) + '…' : plain);
+---
+
+<article class="group relative flex flex-col gap-1.5 border-b border-line py-4 sm:flex-row sm:items-baseline sm:gap-5">
+  <a href={href} class="absolute inset-0 z-10" aria-label={d.title}></a>
+  <time
+    datetime={formatDate(d.date)}
+    class="shrink-0 font-mono text-[12.5px] text-ink-mute sm:w-24"
+  >
+    {formatDate(d.date)}
+  </time>
+  <div class="min-w-0 flex-1">
+    <h3 class="text-[15px] font-semibold leading-snug text-ink transition-colors group-hover:text-accent">
+      {d.title}
+    </h3>
+    <p class="mt-1 line-clamp-2 text-[13.5px] leading-relaxed text-ink-soft">{excerpt}</p>
+    {
+      d.tags.length > 0 && (
+        <ul class="mt-2 flex flex-wrap gap-1.5">
+          {d.tags.map((t) => (
+            <li class="chip" style="pointer-events:none">
+              #{t}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</article>

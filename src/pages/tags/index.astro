@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { tagHref } from '../../lib/site';
+
+const projects = (await getCollection('projects')).filter((p) => !p.data.draft);
+const notes = (await getCollection('notes')).filter((n) => !n.data.draft);
+
+const counts = new Map<string, number>();
+for (const p of projects) for (const t of p.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
+for (const n of notes) for (const t of n.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
+
+const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh'));
+const max = tags.length ? tags[0][1] : 1;
+---
+
+<Base title="标签" description="按标签浏览 CHUN折腾站内的项目与笔记。">
+  <div class="wrap">
+    <header class="mb-9">
+      <h1 class="text-[30px] font-black tracking-tight text-ink sm:text-[38px]">标签</h1>
+      <p class="mt-2 text-[14.5px] text-ink-soft">共 {tags.length} 个标签，字号越大条目越多。</p>
+    </header>
+
+    <ul class="flex flex-wrap items-baseline gap-x-5 gap-y-4">
+      {
+        tags.map(([t, c]) => {
+          const ratio = c / max;
+          const size = 13 + ratio * 9;
+          return (
+            <li>
+              <a
+                href={tagHref(t)}
+                class="inline-flex items-baseline gap-1 text-ink-soft transition-colors hover:text-accent"
+                style={`font-size:${size.toFixed(1)}px`}
+              >
+                <span class="font-semibold">#{t}</span>
+                <span class="font-mono text-[11px] text-ink-mute">{c}</span>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+
+    {
+      tags.length === 0 && (
+        <p class="rounded-xl border border-dashed border-line bg-elev/50 p-10 text-center text-sm text-ink-mute">
+          还没有标签。给项目或笔记加上 <code class="font-mono text-accent">tags</code> 就会出现在这里。
+        </p>
+      )
+    }
+  </div>
+</Base>

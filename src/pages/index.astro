@@ -1,0 +1,162 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import NoteCard from '../components/NoteCard.astro';
+import { SITE, formatDate, sortProjects, tagHref } from '../lib/site';
+
+const allProjects = (await getCollection('projects')).filter((p) => !p.data.draft);
+const projects = [...allProjects].sort(sortProjects);
+
+const allNotes = (await getCollection('notes')).filter((n) => !n.data.draft);
+const notes = [...allNotes].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+/** 置顶的排在前面，其余按「折腾中优先 + 时间倒序」 */
+const ordered = [...projects].sort(
+  (a, b) => Number(b.data.featured) - Number(a.data.featured) || sortProjects(a, b)
+);
+const recent = ordered.slice(0, 6);
+
+// 标签统计
+const tagCount = new Map<string, number>();
+for (const p of allProjects) for (const t of p.data.tags) tagCount.set(t, (tagCount.get(t) ?? 0) + 1);
+for (const n of allNotes) for (const t of n.data.tags) tagCount.set(t, (tagCount.get(t) ?? 0) + 1);
+const tags = [...tagCount.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh'));
+
+const lastUpdated = projects.length
+  ? projects
+      .flatMap((p) => [p.data.startDate, p.data.endDate ?? p.data.startDate])
+      .reduce((a, b) => (a > b ? a : b))
+  : new Date();
+
+const stats = [
+  { label: '项目', value: allProjects.length },
+  { label: '笔记', value: allNotes.length },
+  { label: '标签', value: tags.length },
+  { label: '最后更新', value: formatDate(lastUpdated), small: true },
+];
+---
+
+<Base hero={true}>
+  <!-- Hero -->
+  <section class="relative overflow-hidden border-b border-line">
+    <div
+      class="pointer-events-none absolute inset-0"
+      style="background:
+        radial-gradient(680px 320px at 12% -12%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+        radial-gradient(560px 300px at 88% -20%, color-mix(in srgb, #3b82f6 16%, transparent), transparent 70%);
+      "
+    >
+    </div>
+
+    <div class="wrap relative py-16 sm:py-24">
+      <p
+        class="rise mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-elev/70 px-3 py-1 text-[12.5px] text-ink-soft"
+      >
+        <span class="size-1.5 rounded-full bg-accent"></span>
+        个人项目流水账 · 持续更新中
+      </p>
+
+      <h1
+        class="rise text-[42px] font-black leading-[1.05] tracking-tight sm:text-[64px]"
+        style="animation-delay:.05s"
+      >
+        CHUN<span class="text-accent">折腾</span>
+      </h1>
+
+      <p
+        class="rise mt-4 max-w-xl text-[16px] leading-relaxed text-ink-soft"
+        style="animation-delay:.1s"
+      >
+        {SITE.tagline}——做过什么、怎么做的、踩了哪些坑、最后跑没跑通，都记在这里。
+      </p>
+
+      <div class="rise mt-7 flex flex-wrap items-center gap-2.5" style="animation-delay:.15s">
+        <a href="/projects/" class="btn btn-solid">
+          看全部项目
+          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14m0 0-6-6m6 6-6 6"></path></svg>
+        </a>
+        <a href="/notes/" class="btn">翻折腾笔记</a>
+        <a href="/rss.xml" class="btn">RSS</a>
+      </div>
+
+      <dl
+        class="rise mt-10 grid max-w-2xl grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-4"
+        style="animation-delay:.2s"
+      >
+        {
+          stats.map((s) => (
+            <div class="bg-bg px-4 py-3.5">
+              <dt class="text-[12px] text-ink-mute">{s.label}</dt>
+              <dd
+                class:list={[
+                  'mt-0.5 font-mono font-bold tabular-nums text-ink',
+                  s.small ? 'text-[15px]' : 'text-[22px]',
+                ]}
+              >
+                {s.value}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <div class="wrap py-12 sm:py-16">
+    <!-- 项目 -->
+    <section class="mb-14">
+      <div class="mb-5 flex items-baseline justify-between gap-4">
+        <h2 class="text-[19px] font-bold tracking-tight text-ink">最近在折腾</h2>
+        <a href="/projects/" class="text-[13px] text-ink-mute hover:text-accent">
+          全部 {allProjects.length} 个 →
+        </a>
+      </div>
+
+      {
+        recent.length > 0 ? (
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {recent.map((p) => (
+              <ProjectCard entry={p} />
+            ))}
+          </div>
+        ) : (
+          <p class="rounded-xl border border-dashed border-line bg-elev/50 p-10 text-center text-sm text-ink-mute">
+            还没有项目，去 <code class="font-mono text-accent">src/content/projects/</code> 新建一个 Markdown
+            文件吧。
+          </p>
+        )
+      }
+    </section>
+
+    <!-- 笔记 + 标签 -->
+    <div class="grid gap-12 lg:grid-cols-[1.6fr_1fr]">
+      <section>
+        <div class="mb-4 flex items-baseline justify-between gap-4">
+          <h2 class="text-[19px] font-bold tracking-tight text-ink">折腾笔记</h2>
+          <a href="/notes/" class="text-[13px] text-ink-mute hover:text-accent">全部 →</a>
+        </div>
+        <div class="border-t border-line">
+          {notes.slice(0, 4).map((n) => <NoteCard entry={n} />)}
+        </div>
+      </section>
+
+      <section>
+        <div class="mb-4 flex items-baseline justify-between gap-4">
+          <h2 class="text-[19px] font-bold tracking-tight text-ink">标签</h2>
+          <a href="/tags/" class="text-[13px] text-ink-mute hover:text-accent">全部 →</a>
+        </div>
+        <ul class="flex flex-wrap gap-2">
+          {tags.slice(0, 18).map(([t, c]) => (
+            <li>
+              <a href={tagHref(t)} class="chip !px-2.5 !py-1 !text-[12.5px]">
+                #{t}
+                <span class="ml-0.5 font-mono text-ink-mute">{c}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </div>
+</Base>

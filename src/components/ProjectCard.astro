@@ -1,0 +1,80 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate, gradientFor } from '../lib/site';
+import StatusBadge from './StatusBadge.astro';
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+  compact?: boolean;
+}
+const { entry, compact = false } = Astro.props;
+const d = entry.data;
+const href = `/projects/${entry.id}/`;
+---
+
+<article
+  class="card group relative flex h-full flex-col overflow-hidden"
+  data-status={d.status}
+>
+  <a href={href} class="absolute inset-0 z-10" aria-label={d.title}></a>
+
+  {
+    !compact && (
+      <div
+        class="relative aspect-[16/9] overflow-hidden"
+        style={
+          d.cover
+            ? `background-image:url('${d.cover}');background-size:cover;background-position:center;`
+            : `background-image:${gradientFor(entry.id)};`
+        }
+      >
+        <span class="absolute left-3 top-3 z-20">
+          <StatusBadge status={d.status} />
+        </span>
+        <span
+          class="pointer-events-none absolute -bottom-4 right-3 select-none font-mono text-[64px] font-black leading-none text-white/10"
+          aria-hidden="true"
+        >
+          {entry.id.slice(0, 2).toUpperCase()}
+        </span>
+      </div>
+    )
+  }
+
+  <div class="flex flex-1 flex-col gap-2 p-4">
+    <div class="flex items-start justify-between gap-2">
+      <h3
+        class:list={[
+          'font-bold leading-snug tracking-tight text-ink transition-colors group-hover:text-accent',
+          compact ? 'text-[15px]' : 'text-[16.5px]',
+        ]}
+      >
+        {d.title}
+      </h3>
+      {compact && <StatusBadge status={d.status} />}
+    </div>
+
+    <p class="line-clamp-2 text-[13.5px] leading-relaxed text-ink-soft">{d.summary}</p>
+
+    {d.tags.length > 0 && (
+      <ul class="mt-auto flex flex-wrap gap-1.5 pt-1">
+        {d.tags.slice(0, 4).map((t) => (
+          <li class="chip" style="pointer-events:none">#{t}</li>
+        ))}
+      </ul>
+    )}
+
+    <div
+      class="flex items-center gap-2 pt-1 text-[12px] text-ink-mute"
+      style="padding-top:.5rem"
+    >
+      <time datetime={formatDate(d.startDate)}>{formatDate(d.startDate)}</time>
+      {d.stack.length > 0 && (
+        <>
+          <span aria-hidden="true">·</span>
+          <span class="truncate">{d.stack.slice(0, 2).join(' / ')}</span>
+        </>
+      )}
+    </div>
+  </div>
+</article>

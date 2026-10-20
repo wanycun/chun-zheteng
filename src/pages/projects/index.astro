@@ -1,0 +1,133 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { STATUS } from '../../content.config';
+import { sortProjects } from '../../lib/site';
+
+const all = (await getCollection('projects')).filter((p) => !p.data.draft);
+const projects = [...all].sort(sortProjects);
+
+const counts = new Map<string, number>();
+for (const p of projects) counts.set(p.data.status, (counts.get(p.data.status) ?? 0) + 1);
+const statuses = STATUS.filter((s) => counts.has(s));
+---
+
+<Base title="项目" description={`CHUN折腾的全部项目记录，共 ${projects.length} 个。`}>
+  <div class="wrap">
+    <header class="mb-8">
+      <h1 class="text-[30px] font-black tracking-tight text-ink sm:text-[38px]">全部项目</h1>
+      <p class="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-ink-soft">
+        每一个都是一次真实的动手：从想干什么、选了什么路，到最后跑没跑通。按状态或关键词筛。
+      </p>
+    </header>
+
+    <!-- 筛选条 -->
+    <div class="mb-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="按状态筛选">
+        <button class="filter-btn" data-filter-status="全部" aria-pressed="true">
+          全部 <span class="font-mono text-[11px] opacity-60">{projects.length}</span>
+        </button>
+        {
+          statuses.map((s) => (
+            <button class="filter-btn" data-filter-status={s} aria-pressed="false">
+              {s} <span class="font-mono text-[11px] opacity-60">{counts.get(s)}</span>
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="relative sm:w-64">
+        <svg
+          class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-mute"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <input
+          id="q"
+          type="search"
+          placeholder="搜索标题 / 标签…"
+          class="w-full rounded-full border border-line bg-elev py-2 pl-9 pr-3 text-[13.5px] text-ink outline-none transition-colors placeholder:text-ink-mute focus:border-accent"
+          aria-label="搜索项目"
+        />
+      </div>
+    </div>
+
+    <p class="mb-4 text-[12.5px] text-ink-mute">
+      显示 <span id="shown" class="font-mono text-ink">{projects.length}</span> / {projects.length} 个
+    </p>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        projects.map((p) => (
+          <div
+            class="proj-item"
+            data-status={p.data.status}
+            data-search={`${p.data.title} ${p.data.summary} ${p.data.tags.join(' ')} ${p.data.stack.join(' ')}`.toLowerCase()}
+          >
+            <ProjectCard entry={p} />
+          </div>
+        ))
+      }
+    </div>
+
+    <p
+      id="empty"
+      class="is-hidden rounded-xl border border-dashed border-line bg-elev/50 p-10 text-center text-sm text-ink-mute"
+    >
+      没有匹配的项目，换个关键词或状态试试。
+    </p>
+
+    {
+      projects.length === 0 && (
+        <p class="rounded-xl border border-dashed border-line bg-elev/50 p-10 text-center text-sm text-ink-mute">
+          还没有项目。在 <code class="font-mono text-accent">src/content/projects/</code> 里新建一个 Markdown 文件即可。
+        </p>
+      )
+    }
+  </div>
+</Base>
+
+<script is:inline>
+  (function () {
+    var input = document.getElementById('q');
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-filter-status]'));
+    var items = Array.prototype.slice.call(document.querySelectorAll('.proj-item'));
+    var empty = document.getElementById('empty');
+    var shown = document.getElementById('shown');
+    var state = '全部';
+
+    function apply() {
+      var term = (input && input.value ? input.value : '').trim().toLowerCase();
+      var n = 0;
+      items.forEach(function (el) {
+        var okStatus = state === '全部' || el.getAttribute('data-status') === state;
+        var okTerm = !term || (el.getAttribute('data-search') || '').indexOf(term) > -1;
+        var show = okStatus && okTerm;
+        el.classList.toggle('is-hidden', !show);
+        if (show) n++;
+      });
+      if (empty) empty.classList.toggle('is-hidden', n > 0 || items.length === 0);
+      if (shown) shown.textContent = String(n);
+    }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state = btn.getAttribute('data-filter-status') || '全部';
+        buttons.forEach(function (b) {
+          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+        });
+        apply();
+      });
+    });
+
+    if (input) input.addEventListener('input', apply);
+  })();
+</script>

@@ -1,0 +1,28 @@
+---
+import { tagHref } from '../lib/site';
+
+interface Props {
+  tags: string[];
+  link?: boolean;
+  class?: string;
+}
+const { tags, link = true, class: cls = '' } = Astro.props;
+---
+
+{
+  tags.length > 0 && (
+    <ul class:list={['flex flex-wrap gap-1.5', cls]}>
+      {tags.map((t) =>
+        link ? (
+          <li>
+            <a href={tagHref(t)} class="chip">
+              #{t}
+            </a>
+          </li>
+        ) : (
+          <li class="chip">#{t}</li>
+        )
+      )}
+    </ul>
+  )
+}

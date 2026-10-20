@@ -1,0 +1,67 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import NoteCard from '../../components/NoteCard.astro';
+import { sortProjects } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  const notes = await getCollection('notes');
+  const set = new Set<string>();
+  for (const p of projects.filter((p) => !p.data.draft)) for (const t of p.data.tags) set.add(t);
+  for (const n of notes.filter((n) => !n.data.draft)) for (const t of n.data.tags) set.add(t);
+  return [...set].map((tag) => ({ params: { tag }, props: { tag } }));
+}
+
+const { tag } = Astro.props;
+
+const projects = (await getCollection('projects'))
+  .filter((p) => !p.data.draft && p.data.tags.includes(tag))
+  .sort(sortProjects);
+
+const notes = (await getCollection('notes'))
+  .filter((n) => !n.data.draft && n.data.tags.includes(tag))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<Base title={`#${tag}`} description={`标签 #${tag} 下的项目与笔记。`}>
+  <div class="wrap">
+    <header class="mb-9">
+      <a href="/tags/" class="mb-4 inline-flex items-center gap-1.5 text-[13px] text-ink-mute hover:text-accent">
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 12H5m0 0 6-6m-6 6 6 6"></path></svg>
+        全部标签
+      </a>
+      <h1 class="text-[30px] font-black tracking-tight text-ink sm:text-[38px]">#{tag}</h1>
+      <p class="mt-2 font-mono text-[12.5px] text-ink-mute">
+        {projects.length} 个项目 · {notes.length} 条笔记
+      </p>
+    </header>
+
+    {
+      projects.length > 0 && (
+        <section class="mb-12">
+          <h2 class="mb-4 text-[15px] font-bold text-ink">项目</h2>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {projects.map((p) => (
+              <ProjectCard entry={p} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      notes.length > 0 && (
+        <section>
+          <h2 class="mb-2 text-[15px] font-bold text-ink">笔记</h2>
+          <div class="border-t border-line">
+            {notes.map((n) => (
+              <NoteCard entry={n} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </div>
+</Base>

@@ -1,0 +1,51 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import NoteCard from '../../components/NoteCard.astro';
+
+const all = (await getCollection('notes')).filter((n) => !n.data.draft);
+const notes = [...all].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const byYear = new Map<string, typeof notes>();
+for (const n of notes) {
+  const y = String(n.data.date.getUTCFullYear());
+  if (!byYear.has(y)) byYear.set(y, []);
+  byYear.get(y)!.push(n);
+}
+const years = [...byYear.keys()].sort((a, b) => Number(b) - Number(a));
+---
+
+<Base title="折腾笔记" description="短平快的折腾记录：一条命令、一个配置、一次踩坑。">
+  <div class="wrap">
+    <div class="mx-auto max-w-3xl">
+      <header class="mb-10">
+        <h1 class="text-[30px] font-black tracking-tight text-ink sm:text-[38px]">折腾笔记</h1>
+        <p class="mt-2 text-[14.5px] leading-relaxed text-ink-soft">
+          不成项目的小东西：一条命令、一个配置、一次踩坑。短，但都是当时真卡住过的地方。
+        </p>
+        <p class="mt-3 font-mono text-[12.5px] text-ink-mute">共 {notes.length} 条</p>
+      </header>
+
+      {
+        years.map((y) => (
+          <section class="mb-10">
+            <h2 class="mb-1 font-mono text-[13px] font-bold text-ink-mute">{y}</h2>
+            <div class="border-t border-line">
+              {byYear.get(y)!.map((n) => (
+                <NoteCard entry={n} />
+              ))}
+            </div>
+          </section>
+        ))
+      }
+
+      {
+        notes.length === 0 && (
+          <p class="rounded-xl border border-dashed border-line bg-elev/50 p-10 text-center text-sm text-ink-mute">
+            还没有笔记。在 <code class="font-mono text-accent">src/content/notes/</code> 里新建 Markdown 文件即可。
+          </p>
+        )
+      }
+    </div>
+  </div>
+</Base>
