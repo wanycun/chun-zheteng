@@ -66,7 +66,6 @@ d.rounded_rectangle([px, py, px + shot.width - 1, py + shot.height - 1], radius=
 
 # ── 左侧文字 ───────────────────────────────────────────────
 PAD = 84
-d.text((PAD, 150), "个人项目 · 2026", font=ImageFont.truetype(REG, 22), fill=DIM)
 d.text((PAD, 196), "车来了", font=ImageFont.truetype(BOLD, 88), fill=WHITE)
 
 d.rectangle([PAD, 318, PAD + 64, 323], fill=ORANGE)

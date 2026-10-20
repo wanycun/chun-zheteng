@@ -30,7 +30,7 @@ const related = all
 
 const meta = [
   { k: '开始', v: formatDate(d.startDate) },
-  { k: '结束', v: d.endDate ? formatDate(d.endDate) : '进行中' },
+  { k: '结束', v: d.endDate ? formatDate(d.endDate) : d.status === '已跑通' ? '持续使用中' : '进行中' },
   d.hours != null ? { k: '耗时', v: `约 ${d.hours} 小时` } : null,
   { k: '花费', v: d.cost > 0 ? `¥${d.cost}` : '0 元' },
 ].filter(Boolean) as { k: string; v: string }[];
