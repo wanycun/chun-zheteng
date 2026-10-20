@@ -8,8 +8,12 @@ export const SITE = {
   lang: 'zh-CN',
   /** 页脚 / 关于页展示，留空则不渲染 */
   social: {
-    github: '',
+    github: 'https://github.com/wanycun/chun-zheteng',
     email: '',
+  },
+  /** Cloudflare Web Analytics 站点 token；留空则不注入统计脚本 */
+  analytics: {
+    token: '894af42870f64bf0a1a4408722bd11ad',
   },
 };
 

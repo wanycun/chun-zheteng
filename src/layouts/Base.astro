@@ -78,6 +78,17 @@ const jsonLd = {
     </script>
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    {
+      SITE.analytics?.token && (
+        <script
+          is:inline
+          type="module"
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: SITE.analytics.token })}
+        />
+      )
+    }
   </head>
   <body class="min-h-dvh flex flex-col">
     <a
