@@ -88,7 +88,7 @@ Pages 那边的配置就三行：构建命令 `npm run build`、输出目录 `di
   <img src="/covers/site-notes.jpg" alt="折腾笔记列表：按年份分组" style="flex:1 1 280px;min-width:0;border-radius:12px" />
 </div>
 
-<p style="font-size:13px;color:var(--ink-mute);margin-top:-.6em">左：全部项目（浅色主题，按状态筛选 + 关键词搜索）｜中：项目详情（深色主题，状态 / 耗时 / 花费 / 技术栈）｜右：笔记列表（按年份分组）。深浅两套主题是同一套 token 切出来的。</p>
+<p style="font-size:13px;color:var(--ink-mute);margin-top:-.6em">左：全部项目（按状态筛选 + 关键词搜索）｜中：项目详情（状态 / 耗时 / 花费 / 技术栈）｜右：笔记列表（按年份分组）。三张都是深色主题，浅色主题是同一套 token 反相出来的。</p>
 
 - 53 个页面，构建 2 秒内
 - 首屏零 JS，单页 HTML+CSS 不到 60KB
