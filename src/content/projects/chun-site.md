@@ -6,6 +6,7 @@ startDate: 2026-10-20
 cost: 0
 hours: 8
 stack: [Astro, Tailwind CSS, Markdown, Cloudflare Pages, GitHub Actions]
+cover: /covers/chun-site-cover.jpg
 tags: [建站, Cloudflare, 静态站, Astro]
 featured: true
 repo: https://github.com/wanycun/chun-zheteng
@@ -79,11 +80,20 @@ Pages 那边的配置就三行：构建命令 `npm run build`、输出目录 `di
 
 ## 结果
 
-跑通了，就是你现在看的这一页。
+跑通了，就是你现在看的这一页。三个主要界面长这样：
 
-- 44 个页面，构建 2 秒内
+<div style="display:flex;flex-wrap:wrap;gap:12px;margin:1.5em 0">
+  <img src="/covers/site-list.jpg" alt="全部项目列表：状态筛选、搜索、卡片网格" style="flex:1 1 280px;min-width:0;border-radius:12px" />
+  <img src="/covers/site-detail.jpg" alt="项目详情页：状态、耗时花费、技术栈、正文" style="flex:1 1 280px;min-width:0;border-radius:12px" />
+  <img src="/covers/site-notes.jpg" alt="折腾笔记列表：按年份分组" style="flex:1 1 280px;min-width:0;border-radius:12px" />
+</div>
+
+<p style="font-size:13px;color:var(--ink-mute);margin-top:-.6em">左：全部项目（按状态筛选 + 关键词搜索）｜中：项目详情（状态 / 耗时 / 花费 / 技术栈）｜右：笔记列表（按年份分组）</p>
+
+- 53 个页面，构建 2 秒内
 - 首屏零 JS，单页 HTML+CSS 不到 60KB
 - 费用：托管 0 元，域名是原本就有的
 - 发布体验：改一个 md，`git push`，一分钟内线上生效
+- 统计：Cloudflare Web Analytics，无 Cookie，不影响首屏
 
 值不值：**值**。写记录的阻力从"打开某个 App"降到"新建一个文件"，这才是能坚持下去的关键。
