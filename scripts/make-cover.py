@@ -71,7 +71,7 @@ d.text((PAD, 196), "车来了", font=ImageFont.truetype(BOLD, 88), fill=WHITE)
 d.rectangle([PAD, 318, PAD + 64, 323], fill=ORANGE)
 
 d.text((PAD, 356), "广州实时公交 · 自建网页版", font=ImageFont.truetype(REG, 32), fill=GRAY)
-d.text((PAD, 410), "飞牛 NAS 上跑服务 · iPhone 打开即用", font=ImageFont.truetype(REG, 24), fill=DIM)
+d.text((PAD, 410), "Cloudflare Pages 托管 · iPhone 打开即用", font=ImageFont.truetype(REG, 24), fill=DIM)
 
 # 底部标签
 tag_font = ImageFont.truetype(REG, 22)
